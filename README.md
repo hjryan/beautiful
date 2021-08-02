@@ -7,4 +7,5 @@ beautiful is a Slack app written using Bolt for Python. It includes:
 - a variety of annoying emoji-based Easter eggs
 
 Here are those features in action:
+
 ![](beautiful.gif)
