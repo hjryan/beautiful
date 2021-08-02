@@ -55,7 +55,7 @@ hotdog_list = [
 @app.message("canoe")
 @app.message("Canoe")
 def message_kayak(message, say):
-    """ congratulate or commiserate re: kayaking"""
+    """congratulate or commiserate re: kayaking"""
     say(
         blocks=[
             {"type": "section", "text": {"type": "mrkdwn", "text": f"<@{message['user']}>, are you going :kayaking:?"},
@@ -72,7 +72,7 @@ def message_kayak(message, say):
 
 @app.action("button_click_kayaking")
 def action_button_click_kayaking(body, ack, say):
-    """ send congratulations """
+    """send congratulations"""
     ack()
     body = "kayaking congratulations"
     [say(item) for item in kayaking_list[::]]
@@ -178,11 +178,10 @@ def update_home_tab(client, event, logger):
         logger.error(f"Error publishing home tab: {e}")
 
 
-# listens to incoming messages that contain "weather"
 @app.message("weather?")
 @app.message("Weather?")
 def message_weather(message, say, client):
-    """ find out where bianca is in order to call openweather api """
+    """find out where bianca is in order to call openweather api"""
     say({"blocks": [{
             "type": "section",
             "text": {"type": "mrkdwn", "text": "Where _is_ Bianca?"},
@@ -199,9 +198,9 @@ def message_weather(message, say, client):
         })
     
 
-# use bianca's location provided by dropdown to prepare response, send
 @app.action("static_select-action_weather")
 def weather(ack, body, logger, say):
+    """use bianca's location provided by dropdown to prepare response, send"""
     ack()
     try:
         # parse hideous response from dropdown
@@ -234,7 +233,6 @@ def weather(ack, body, logger, say):
 
 @app.message("meat")
 def message_meat(message, client, event, logger, say):
-
     """find out where we're lookin to call the yelp api"""
     say({"blocks": [{
             "type": "section",
@@ -252,9 +250,10 @@ def message_meat(message, client, event, logger, say):
             }]
         })
 
-# use location provided by dropdown to prepare response, send
+
 @app.action("static_select-action_hot_dog")
 def hot_dog(ack, body, logger, say):
+    """use location provided by dropdown to prepare response, send"""
     ack()
     try:
         # parse hideous response from dropdown
@@ -280,7 +279,7 @@ def hot_dog(ack, body, logger, say):
 
 @app.event("emoji_changed") 
 def message_emoji(message, client, event, logger):
-    """posts to emoji_town whenever a new emoji is added"""
+    """post to emoji_town whenever a new emoji is added"""
 
     # excludes changes and removals
     if event["subtype"] == "add":
@@ -300,6 +299,7 @@ def message_emoji(message, client, event, logger):
         except Exception as e:
             logger.error(f"Error publishing new emoji: {e}")
 
+                    
 # start app
 if __name__ == "__main__":
     app.start(port=int(os.environ.get("PORT", 3000)))
