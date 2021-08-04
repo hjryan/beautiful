@@ -1,7 +1,9 @@
 import os
 import requests
+import time
 from slack_bolt import App
 from yelpapi import YelpAPI
+
 
 # initializes app with bot token and signing secret
 app = App(token=os.environ.get('SLACK_BOT_TOKEN'),
@@ -123,6 +125,7 @@ def action_button_click_double_wide(body, ack, say, logger):
         [say(item * 2) for item in hotdog_list[::]]
         say(":hotdog_wave:" * 2)
         [say(item * 2) for item in hotdog_list[::-1]]
+        david_wants_condiments(say, logger)
     except Exception as e:
         logger.error(f"Error doing double long: {e}")
 
@@ -138,6 +141,7 @@ def action_button_click_double_long(body, ack, say, logger):
         [say(item) for item in hotdog_list[1::]]
         say(":hotdog_wave:")
         [say(item) for item in hotdog_list[::-1]]
+        david_wants_condiments(say, logger)
     except Exception as e:
         logger.error(f"Error doing double long: {e}")
 
@@ -150,8 +154,53 @@ def action_button_click_regular(body, ack, say, logger):
         [say (item) for item in hotdog_list[::]]
         say(":hotdog_wave:")
         [say (item) for item in hotdog_list[::-1]]
+        david_wants_condiments(say, logger)
     except Exception as e:
         logger.error(f"Error doing regular hot dog: {e}")
+
+
+def david_wants_condiments(say, logger):
+    """whatever david"""
+    say(
+        blocks=[
+            {"type": "section",
+            "text": {"type": "mrkdwn", "text": f"Do you want any condiments?"},
+            "accessory": {"type": "button", "text": {"type": "plain_text", "text": ":onion_angel:" * 3}, "action_id": "button_click_david"}},
+            
+            {"type": "section","text": {"type": "mrkdwn", "text": " "}, "accessory": {"type": "button",
+            "text": {"type": "plain_text", "text": ":tomato_smack:" * 3}, "action_id": "button_click_david"}},
+            
+            {"type": "section", "text": {"type": "mrkdwn", "text": " "}, "accessory": {"type": "button",
+            "text": {"type": "plain_text", "text": ":swaddled_pickle_rocking:" * 3}, "action_id": "button_click_david"}},
+
+            {"type": "section","text": {"type": "mrkdwn", "text": " "}, "accessory": {"type": "button",
+            "text": {"type": "plain_text", "text": ":weary_hotdog_mustard:" * 3}, "action_id": "button_click_david"}},
+
+            {"type": "section","text": {"type": "mrkdwn", "text": " "}, "accessory": {"type": "button",
+            "text": {"type": "plain_text", "text": "no thank you, this isn't real"}, "action_id": "button_click_not_david"}}
+        ],
+        text=f"Do you want any condiments?",
+    )
+
+
+@app.action("button_click_david")
+def action_button_click_david(body, ack, say, logger):
+    """scold david"""
+    ack()
+    try:
+        say("_MAYBE_ you should go eat a _LOBSTER ROLL_ while you _LIVE_ in _MAINE_")
+    except Exception as e:
+        logger.error(f"Error scolding David: {e}")
+
+
+@app.action("button_click_not_david")
+def action_button_click_david(body, ack, say, logger):
+    """wave to non-david user"""
+    ack()
+    try:
+        say(":hotdog_wave:")
+    except Exception as e:
+        logger.error(f"Error waving to not David: {e}")
 
 
 @app.event("app_home_opened")
@@ -178,8 +227,8 @@ def update_home_tab(client, event, logger):
         logger.error(f"Error publishing home tab: {e}")
 
 
-@app.message("weather?")
-@app.message("Weather?")
+@app.message("weather")
+@app.message("Weather")
 def message_weather(message, say, client):
     """find out where bianca is in order to call openweather api"""
     say({"blocks": [{
@@ -231,50 +280,40 @@ def weather(ack, body, logger, say):
             logger.error(f"Error providing weather report: {e}")
 
 
-@app.message("meat")
+@app.message("yelp")
+@app.message("Yelp")
+@app.message("YELP")
 def message_meat(message, client, event, logger, say):
     """find out where we're lookin to call the yelp api"""
-    say({"blocks": [{
-            "type": "section",
-            "text": {"type": "mrkdwn", "text": "Where are we seeking hot dogs?"},
-            "accessory": {
-                "type": "static_select",
-                "placeholder": {"type": "plain_text", "text": "Hot dog location"},
-                "options": [
-                    {"text": {"type": "plain_text", "text": "Brooklyn"}, "value": "Brooklyn, NY"},
-                    {"text": {"type": "plain_text", "text": "Hancock"}, "value": "Hancock, Mass"},
-                    {"text": {"type": "plain_text", "text": "Hollis"}, "value": "Hollis, Maine"},
-                    {"text": {"type": "plain_text", "text": "Rangeley"}, "value": "Rangeley, Maine"},
-                    {"text": {"type": "plain_text", "text": "Seattle"}, "value": "Capitol Hill, Seattle"}],
-                "action_id": "static_select-action_hot_dog"}
-            }]
-        })
+    user_input = message['blocks'][0]['elements'][0]['elements'][0]['text'].split()
 
-
-@app.action("static_select-action_hot_dog")
-def hot_dog(ack, body, logger, say):
-    """use location provided by dropdown to prepare response, send"""
-    ack()
     try:
-        # parse hideous response from dropdown
-        location = body['actions'][0]['selected_option']['value']
+        # parse user input -- location should be the last field
+        location = user_input[-1]
+
+        # search term should be whatever happened before that, except for "yelp" -- made back into a sentence
+        term = ' '.join(user_input[1:-1])
     
         yelp_api = YelpAPI(yelp_key)
-        search_results = yelp_api.search_query(term="hotdog",location=location)['businesses']
+        search_results = yelp_api.search_query(term=term,location=location)['businesses']
         
-        say("Here are some hot dog retailers near your requested location:")
+        text = "Here are some businesses near your requested location:"
+        say(text)
+
+        # limit to first 8 results
         for index, item in zip(range(8), search_results):
-            say({"blocks": [{
+
+            text = {"blocks": [{
                     "type": "section",
-                    "text": {"type": "mrkdwn","text": f"{item['name']} has {item['rating']} stars!"},
-                    "accessory": {
-                        "type": "image",
-                        "image_url": item['image_url'],
-                        "alt_text": "yelp pic"}
-                    }]})
+                    "text": {"type": "mrkdwn","text": f"<{item['url']}|{item['name']}> has {item['rating']} stars!"},
+                    }]}
+            say(text)
+
+            # give it a second to load the image
+            time.sleep(2)
 
     except Exception as e:
-        logger.error(f"Error publishing hot dog data: {e}")
+        logger.error(f"Error publishing yelp data: {e}")
 
 
 @app.event("emoji_changed") 
