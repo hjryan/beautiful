@@ -15,6 +15,9 @@ open_weather = os.environ.get('OPEN_WEATHER')
 # include yelp key
 yelp_key = os.environ.get('YELP')
 
+# include purple air key
+purple_key = os.environ.get('PURPLE')
+
 
 # save some text lists for later
 
@@ -56,6 +59,8 @@ hotdog_list = [
 @app.message("KAYAK")
 @app.message("canoe")
 @app.message("Canoe")
+@app.message("row")
+@app.message("Row")
 def message_kayak(message, say):
     """congratulate or commiserate re: kayaking"""
     say(
@@ -77,7 +82,7 @@ def action_button_click_kayaking(body, ack, say):
     """send congratulations"""
     ack()
     body = "kayaking congratulations"
-    [say(item) for item in kayaking_list[::]]
+    [say(item) for item in kayaking_list[:]]
     say("wow!!!!!!!!!!!!!")
     say("congratulations!")
     [say(item) for item in kayaking_list[::-1]]
@@ -88,7 +93,7 @@ def action_button_click_not_kayaking(body, ack, say):
     """send commiseration"""
     ack()
     body = "kayaking commiseration"
-    [say(item) for item in not_kayaking_list[::]]
+    [say(item) for item in not_kayaking_list[:]]
 
 
 @app.message("sausage")
@@ -99,6 +104,8 @@ def action_button_click_not_kayaking(body, ack, say):
 @app.message("Hotdog")
 @app.message("extra meat")
 @app.message("Extra meat")
+@app.message("meat")
+@app.message("Meat")
 def message_hotdog(message, say):
     """find out what kind o' hot dog is desired"""
     say(
@@ -122,7 +129,7 @@ def action_button_click_double_wide(body, ack, say, logger):
     """send double wide hot dog message"""
     ack()
     try:
-        [say(item * 2) for item in hotdog_list[::]]
+        [say(item * 2) for item in hotdog_list[:]]
         say(":hotdog_wave:" * 2)
         [say(item * 2) for item in hotdog_list[::-1]]
         david_wants_condiments(say, logger)
@@ -135,7 +142,7 @@ def action_button_click_double_long(body, ack, say, logger):
     """send double long hot dog message"""
     ack()
     try:
-        [say(item) for item in hotdog_list[::]]
+        [say(item) for item in hotdog_list[:]]
         say(":hotdog_wave:")
         [say(item) for item in hotdog_list[::-1]]
         [say(item) for item in hotdog_list[1::]]
@@ -151,7 +158,7 @@ def action_button_click_regular(body, ack, say, logger):
     """send regular hot dog message"""
     ack()
     try:
-        [say (item) for item in hotdog_list[::]]
+        [say (item) for item in hotdog_list[:]]
         say(":hotdog_wave:")
         [say (item) for item in hotdog_list[::-1]]
         david_wants_condiments(say, logger)
@@ -217,10 +224,16 @@ def update_home_tab(client, event, logger):
         "callback_id": "home_view",
         # body of the view
         "blocks": [
-            {"type": "section", "text": {"type": "mrkdwn", "text": "*Welcome to _Beautiful's Home_* :tada:"}},
+            {"type": "section", "text": {"type": "mrkdwn", "text": "*Welcome to _Beautiful_'s Home* :flushed_pants: :horse_cargo_shorts: :virus_yellow:"}},
             {"type": "divider"},
-            {"type": "section", "text": {"type": "mrkdwn","text": f"Hi <@{event['user']}>! So far, Beautiful has functions defined for messages containing the words kayak and sausage, weather analysis, a hot dog locator, and emoji additions."}},
-            {"type": "image", "image_url": "https://tenor.com/view/kermit-dancing-happy-smiling-gif-14490278", "alt_text": "kermit dancing"}
+            {"type": "section", "text": {"type": "mrkdwn","text": f"Hi <@{event['user']}>!"}},
+            {"type": "section", "text": {"type": "mrkdwn","text": ":yelp_logo_small: To *search Yelp*, type _please yelp [your search term] in [your search location]_. The first eight results will be displayed."}},
+            {"type": "section", "text": {"type": "mrkdwn","text": ":alien_bong: To get the current *air quality*, type _aqi_."}},
+            {"type": "section", "text": {"type": "mrkdwn","text": ":sunglasses_spin: To determine whether the *weather* is currently warmer for Hannah or Bianca, type _weather_."}},
+            {"type": "section", "text": {"type": "mrkdwn","text": ":honk_nod: To see *emoji* as they are added in real time, please visit #emoji_town."}},
+            {"type": "section", "text": {"type": "mrkdwn","text": ":jacked: To experience other Easter eggs, just mention *kayaking* or *hot dogs*."}},
+            {"type": "image", "image_url": "https://tenor.com/view/kermit-dancing-happy-smiling-gif-14490278", "alt_text": "kermit dancing"},
+            {"type": "section", "text": {"type": "mrkdwn","text": f"_All emoji here are borrowed -- many from Diana :admire:_"}}
             ]
         })
     except Exception as e:
@@ -241,7 +254,8 @@ def message_weather(message, say, client):
                     {"text": {"type": "plain_text", "text": "Brooklyn"}, "value": "Brooklyn"},
                     {"text": {"type": "plain_text", "text": "Hancock"}, "value": "Hancock"},
                     {"text": {"type": "plain_text", "text": "Hollis"}, "value": "Hollis"},
-                    {"text": {"type": "plain_text", "text": "Rangeley"}, "value": "Rangeley"}],
+                    {"text": {"type": "plain_text", "text": "Rangeley"}, "value": "Rangeley"},
+                    {"text": {"type": "plain_text", "text": "Stratton"}, "value": "Stratton"}],
                 "action_id": "static_select-action_weather"}
             }]
         })
@@ -280,24 +294,82 @@ def weather(ack, body, logger, say):
             logger.error(f"Error providing weather report: {e}")
 
 
-@app.message("yelp")
-@app.message("Yelp")
-@app.message("YELP")
+@app.message("aqi")
+@app.message("Aqi")
+@app.message("AQI")
+@app.message("air quality")
+@app.message("Air quality")
+@app.message("PM")
+def air_quality(message, client, event, logger, say):
+    """query purpleair api for air quality data"""
+
+    # default sensor
+    sensor = "94279"
+
+    try:
+        # check whether user has provided a different sensor
+        user_message = message['text'].lower()
+        if "sensor" in user_message:
+            message_list = user_message.split()
+            location_of_word_sensor = message_list.index("sensor")
+            sensor = message_list[location_of_word_sensor + 1]
+        
+        # query purple air
+        response = requests.get(f"https://api.purpleair.com/v1/sensors/{sensor}",
+            headers={"X-API-Key": purple_key})
+        
+        # save PM2.5 & sensor name for use in response
+        pm_2_point_5 =response.json()['sensor']['stats']['pm2.5']
+        sensor_name =response.json()['sensor']['name']
+
+        # tell the user how their air quality measures up
+        if pm_2_point_5 < 12:
+            say(f"PM2.5 at {sensor_name} is currently {pm_2_point_5}, which is good (less than 12)")
+        elif pm_2_point_5 > 12 and pm_2_point_5 < 35.5:
+            say(f"PM2.5 at {sensor_name} is currently {pm_2_point_5}, which is moderate (between 12 and 35.5)")
+        elif pm_2_point_5 > 35.5 and pm_2_point_5 < 55.5:
+            say(f"PM2.5 at {sensor_name} is currently {pm_2_point_5}, which is unhealthy for sensitive groups (between 35.5 and 55.5)")
+        elif pm_2_point_5 > 55.5 and pm_2_point_5 < 150.5:
+            say(f"PM2.5 at {sensor_name} is currently {pm_2_point_5}, which is unhealthy (between 55.5 and 150.5)")
+        elif pm_2_point_5 > 150.5 and pm_2_point_5 < 250.5:
+            say(f"PM2.5 at {sensor_name} is currently {pm_2_point_5}, which is very unhealthy (between 150.5 and 250.5)")
+        elif pm_2_point_5 > 250.5 and pm_2_point_5 < 500.5:
+            say(f"PM2.5 at {sensor_name} is currently {pm_2_point_5}, which is hazardous (between 250.5 and 500.5)")
+        else:
+            say(f"PM2.5 is currently {pm_2_point_5}, which is outside of the range of this program RIP")
+
+        # user education re: how to get data for another sensor
+        say("if this isn't an appropriate sensor, trying saying 'aqi sensor YourSensor'")
+        say("to find a sensor, visit purpleair.com/map, click on a dot, and view the number after 'select=' in the url")
+        
+    except Exception as e:
+            logger.error(f"Error providing AQI report: {e}")
+
+
+@app.message("please yelp")
+@app.message("Please yelp")
+@app.message("Please Yelp")
+@app.message("PLEASE YELP")
 def message_meat(message, client, event, logger, say):
     """find out where we're lookin to call the yelp api"""
     user_input = message['blocks'][0]['elements'][0]['elements'][0]['text'].split()
 
     try:
-        # parse user input -- location should be the last field
-        location = user_input[-1]
+        # parse user input
 
-        # search term should be whatever happened before that, except for "yelp" -- made back into a sentence
-        term = ' '.join(user_input[1:-1])
+        location_of_word_yelp = user_input.index("yelp")
+        location_of_word_in = user_input.index("in")
+
+        # search location should be anything that happens after the word in
+        location = ' '.join(user_input[location_of_word_in + 1:])
+
+        # search term should be whatever happened before "in Location", starting after "please yelp" -- made back into a sentence
+        term = ' '.join(user_input[location_of_word_yelp + 1 : location_of_word_in - 1])
     
         yelp_api = YelpAPI(yelp_key)
         search_results = yelp_api.search_query(term=term,location=location)['businesses']
         
-        text = "Here are some businesses near your requested location:"
+        text = f"Here are some {term} businesses near your requested location:"
         say(text)
 
         # limit to first 8 results
