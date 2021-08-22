@@ -322,25 +322,29 @@ def air_quality(message, client, event, logger, say):
         pm_2_point_5 =response.json()['sensor']['stats']['pm2.5']
         sensor_name =response.json()['sensor']['name']
 
-        # tell the user how their air quality measures up
+
+        # determine how their air quality measures up
         if pm_2_point_5 < 12:
-            say(f"PM2.5 at {sensor_name} is currently {pm_2_point_5}, which is good (less than 12)")
+            end = f"*good* (less than 12)"
         elif pm_2_point_5 > 12 and pm_2_point_5 < 35.5:
-            say(f"PM2.5 at {sensor_name} is currently {pm_2_point_5}, which is moderate (between 12 and 35.5)")
+            end = "*moderate* (between 12 and 35.5)"
         elif pm_2_point_5 > 35.5 and pm_2_point_5 < 55.5:
-            say(f"PM2.5 at {sensor_name} is currently {pm_2_point_5}, which is unhealthy for sensitive groups (between 35.5 and 55.5)")
+            end = "*unhealthy* for sensitive groups (between 35.5 and 55.5)"
         elif pm_2_point_5 > 55.5 and pm_2_point_5 < 150.5:
-            say(f"PM2.5 at {sensor_name} is currently {pm_2_point_5}, which is unhealthy (between 55.5 and 150.5)")
+            end = "*unhealthy* (between 55.5 and 150.5)"
         elif pm_2_point_5 > 150.5 and pm_2_point_5 < 250.5:
-            say(f"PM2.5 at {sensor_name} is currently {pm_2_point_5}, which is very unhealthy (between 150.5 and 250.5)")
+            end = "*very unhealthy* (between 150.5 and 250.5)"
         elif pm_2_point_5 > 250.5 and pm_2_point_5 < 500.5:
-            say(f"PM2.5 at {sensor_name} is currently {pm_2_point_5}, which is hazardous (between 250.5 and 500.5)")
+            end = "*hazardous* (between 250.5 and 500.5)"
         else:
-            say(f"PM2.5 is currently {pm_2_point_5}, which is outside of the range of this program RIP")
+            end = "*outside of the range of this program RIP*"
+
+        # inform user
+        say(f"PM2.5 at *{sensor_name}* is currently *{pm_2_point_5}*, which is {end}")
 
         # user education re: how to get data for another sensor
-        say("if this isn't an appropriate sensor, trying saying 'aqi sensor YourSensor'")
-        say("to find a sensor, visit purpleair.com/map, click on a dot, and view the number after 'select=' in the url")
+        say("_if this isn't an appropriate sensor, trying saying 'aqi sensor YourSensorID'_")
+        say("_to find a sensor ID, visit purpleair.com/map, click on a dot, and view the number after 'select=' in the url_")
         
     except Exception as e:
             logger.error(f"Error providing AQI report: {e}")
@@ -364,12 +368,12 @@ def message_meat(message, client, event, logger, say):
         location = ' '.join(user_input[location_of_word_in + 1:])
 
         # search term should be whatever happened before "in Location", starting after "please yelp" -- made back into a sentence
-        term = ' '.join(user_input[location_of_word_yelp + 1 : location_of_word_in - 1])
+        term = ' '.join(user_input[location_of_word_yelp + 1 : location_of_word_in])
     
         yelp_api = YelpAPI(yelp_key)
         search_results = yelp_api.search_query(term=term,location=location)['businesses']
         
-        text = f"Here are some {term} businesses near your requested location:"
+        text = f"Here are some {term} businesses near {location}:"
         say(text)
 
         # limit to first 8 results
