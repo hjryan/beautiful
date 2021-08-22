@@ -9,4 +9,21 @@ beautiful is a Slack app written using Bolt for Python. It includes:
 
 Here are those features in action:
 
-![](beautiful.gif)
+App's home screen:
+![](home.gif)
+
+Emoji uploads:
+![](emoji.gif)
+
+Weather analysis:
+![](weather.gif)
+
+Yelp:
+![](yelp.gif)
+
+Air quality analysis:
+![](air.gif)
+
+Easter eggs:
+![](hot_dogs.gif)
+
