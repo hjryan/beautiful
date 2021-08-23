@@ -236,6 +236,7 @@ def update_home_tab(client, event, logger):
             {"type": "section", "text": {"type": "mrkdwn","text": f"_All emoji here are borrowed -- many from Diana :admire:_"}}
             ]
         })
+        air_quality_background(client, event, logger)
     except Exception as e:
         logger.error(f"Error publishing home tab: {e}")
 
@@ -329,7 +330,7 @@ def air_quality(message, client, event, logger, say):
         elif pm_2_point_5 > 12 and pm_2_point_5 < 35.5:
             end = "*moderate* (between 12 and 35.5)"
         elif pm_2_point_5 > 35.5 and pm_2_point_5 < 55.5:
-            end = "*unhealthy* for sensitive groups (between 35.5 and 55.5)"
+            end = "*unhealthy for sensitive groups* (between 35.5 and 55.5)"
         elif pm_2_point_5 > 55.5 and pm_2_point_5 < 150.5:
             end = "*unhealthy* (between 55.5 and 150.5)"
         elif pm_2_point_5 > 150.5 and pm_2_point_5 < 250.5:
@@ -350,17 +351,87 @@ def air_quality(message, client, event, logger, say):
             logger.error(f"Error providing AQI report: {e}")
 
 
+#TODO: get this to start when app starts, remove from homepage event
+def air_quality_background(client, event, logger, prev_classification = "", count = 0):
+    """query purpleair api for air quality data"""
+
+    print("aqi being checked in background")
+
+    if count == 0:
+        prev_classification = "good"
+        count = 1
+
+    # default sensor
+    sensor = "94279"
+
+    try:
+        # query purple air
+        response = requests.get(f"https://api.purpleair.com/v1/sensors/{sensor}",
+            headers={"X-API-Key": purple_key})
+        
+        # save PM2.5 & sensor name for use in response
+        pm_2_point_5 =response.json()['sensor']['stats']['pm2.5']
+        sensor_name =response.json()['sensor']['name']
+
+
+        # determine how their air quality measures up
+        if pm_2_point_5 < 12:
+            classification = "good"
+        elif pm_2_point_5 > 12 and pm_2_point_5 < 35.5:
+            classification = "moderate"
+        elif pm_2_point_5 > 35.5 and pm_2_point_5 < 55.5:
+            end = "unhealthy for sensitive groups"
+        elif pm_2_point_5 > 55.5 and pm_2_point_5 < 150.5:
+            classification = "unhealthy"
+        elif pm_2_point_5 > 150.5 and pm_2_point_5 < 250.5:
+            classification = "very unhealthy"
+        elif pm_2_point_5 > 250.5 and pm_2_point_5 < 500.5:
+            classification = "hazardous"
+        else:
+            classification = "outside of the range of this program, RIP"
+
+        print(classification)
+
+        if prev_classification != classification:
+            # tell me if the range changed
+
+            # find an appropriate emoji
+            if prev_classification == "good":
+                emoji = ":blob_broken:"
+            elif prev_classification == "moderate" and classification != "good":
+                emoji = ":blob_broken:"
+            elif prev_classification == "unhealthy for sensitive groups" and classification != "moderate":
+                emoji = ":blob_broken:"
+            elif prev_classification == "unhealthy" and classification != "unhealthy for sensitive groups":
+                emoji = ":blob_broken:"
+            elif prev_classification == "very unhealthy" and classification != "unhealthy":
+                emoji = ":blob_broken:"
+            elif prev_classification == "hazardous" and classification != "very unhealthy":
+                emoji = ":blob_broken:"
+            else:
+                emoji = ":applause:"
+
+            result = client.chat_postMessage(channel="C02FMJW3Z", text=f"{emoji} <@U02FMJW3R>, air quality at *{sensor_name}* has changed to *{classification}* (PM2.5 is {pm_2_point_5})")
+
+        # check every 15 min
+        time.sleep(900)
+        air_quality_background(client, event, logger, classification, count)
+        
+    except Exception as e:
+            logger.error(f"Error providing AQI report: {e}")
+
+
 @app.message("please yelp")
 @app.message("Please yelp")
 @app.message("Please Yelp")
 @app.message("PLEASE YELP")
-def message_meat(message, client, event, logger, say):
-    """find out where we're lookin to call the yelp api"""
+def message_yelp(message, client, event, logger, say):
+    """send user's search query to yelp api, return results"""
+
     user_input = message['blocks'][0]['elements'][0]['elements'][0]['text'].split()
 
     try:
         # parse user input
-
         location_of_word_yelp = user_input.index("yelp")
         location_of_word_in = user_input.index("in")
 
@@ -369,10 +440,12 @@ def message_meat(message, client, event, logger, say):
 
         # search term should be whatever happened before "in Location", starting after "please yelp" -- made back into a sentence
         term = ' '.join(user_input[location_of_word_yelp + 1 : location_of_word_in])
-    
+
+        # call api
         yelp_api = YelpAPI(yelp_key)
         search_results = yelp_api.search_query(term=term,location=location)['businesses']
         
+        # return results
         text = f"Here are some {term} businesses near {location}:"
         say(text)
 
@@ -390,6 +463,7 @@ def message_meat(message, client, event, logger, say):
 
     except Exception as e:
         logger.error(f"Error publishing yelp data: {e}")
+        say(f"Error publishing yelp data: {e}")
 
 
 @app.event("emoji_changed") 
@@ -406,7 +480,7 @@ def message_emoji(message, client, event, logger):
                 headers={'Authorization': f'Bearer {os.environ.get("SLACK_BOT_TOKEN")}'})
 
             # save to list -- not very efficient -- todo only get most recently added to json
-            emoji = [ name for name, url in response.json()['emoji'].items()]
+            emoji = [name for name, url in response.json()['emoji'].items()]
 
             # post new emoji to emoji_town
             result = client.chat_postMessage(channel="C029T1LM06L", text=":" + emoji[-1] + ":")
