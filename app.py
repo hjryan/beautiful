@@ -11,12 +11,10 @@ logging.basicConfig(level=logging.DEBUG)
 app = App()
 
 
-@app.command("/hello-bolt-python-heroku")
-def hello(body, ack):
-    user_id = body["user_id"]
-    ack(f"Hi <@{user_id}>!")
-
-
+# @app.command("/hello-bolt-python-heroku")
+# def hello(body, ack):
+#     user_id = body["user_id"]
+#     ack(f"Hi <@{user_id}>!")
 
 
 # initializes app with bot token and signing secret
@@ -24,13 +22,13 @@ def hello(body, ack):
 #           signing_secret=os.environ.get('SLACK_SIGNING_SECRET'))
 
 # include open weather key
-open_weather = os.environ.get('OPEN_WEATHER')
+# open_weather = os.environ.get('OPEN_WEATHER')
 
-# include yelp key
-yelp_key = os.environ.get('YELP')
+# # include yelp key
+# yelp_key = os.environ.get('YELP')
 
-# include purple air key
-purple_key = os.environ.get('PURPLE')
+# # include purple air key
+# purple_key = os.environ.get('PURPLE')
 
 
 # save some text lists for later
@@ -508,21 +506,19 @@ def message_emoji(message, client, event, logger, say):
 #     print(message)
 
 
-@app.message("weather")
-def message_weather(message, say):
-    say("uhhhhhh")
-
-from flask import Flask, request
-from slack_bolt.adapter.flask import SlackRequestHandler
-
-flask_app = Flask(__name__)
-handler = SlackRequestHandler(app)
 
 
-@flask_app.route("/slack/events", methods=["POST"])
-def slack_events():
-    return handler.handle(request)
-########################################
+# from flask import Flask, request
+# from slack_bolt.adapter.flask import SlackRequestHandler
+
+# flask_app = Flask(__name__)
+# handler = SlackRequestHandler(app)
+
+
+# @flask_app.route("/slack/events", methods=["POST"])
+# def slack_events():
+#     return handler.handle(request)
+
 
 # start app
 # if __name__ == "__main__":
