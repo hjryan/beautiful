@@ -20,13 +20,13 @@ app = App()
 #           signing_secret=os.environ.get('SLACK_SIGNING_SECRET'))
 
 # include open weather key
-# open_weather = os.environ.get('OPEN_WEATHER')
+open_weather = os.environ.get('OPEN_WEATHER')
 
-# # include yelp key
-# yelp_key = os.environ.get('YELP')
+# include yelp key
+yelp_key = os.environ.get('YELP')
 
-# # include purple air key
-# purple_key = os.environ.get('PURPLE')
+# include purple air key
+purple_key = os.environ.get('PURPLE')
 
 
 # save some text lists for later
