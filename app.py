@@ -16,26 +16,12 @@ def hello(body, ack):
     user_id = body["user_id"]
     ack(f"Hi <@{user_id}>!")
 
-@app.message("weather")
-def message_weather(message, say):
-    say("uhhhhhh")
 
-from flask import Flask, request
-from slack_bolt.adapter.flask import SlackRequestHandler
-
-flask_app = Flask(__name__)
-handler = SlackRequestHandler(app)
-
-
-@flask_app.route("/slack/events", methods=["POST"])
-def slack_events():
-    return handler.handle(request)
-########################################
 
 
 # initializes app with bot token and signing secret
-app = App(token=os.environ.get('SLACK_BOT_TOKEN'),
-          signing_secret=os.environ.get('SLACK_SIGNING_SECRET'))
+# app = App(token=os.environ.get('SLACK_BOT_TOKEN'),
+#           signing_secret=os.environ.get('SLACK_SIGNING_SECRET'))
 
 # include open weather key
 open_weather = os.environ.get('OPEN_WEATHER')
@@ -521,6 +507,23 @@ def message_emoji(message, client, event, logger, say):
 #     """print message details to terminal"""
 #     print(message)
 
+
+@app.message("weather")
+def message_weather(message, say):
+    say("uhhhhhh")
+
+from flask import Flask, request
+from slack_bolt.adapter.flask import SlackRequestHandler
+
+flask_app = Flask(__name__)
+handler = SlackRequestHandler(app)
+
+
+@flask_app.route("/slack/events", methods=["POST"])
+def slack_events():
+    return handler.handle(request)
+########################################
+
 # start app
-if __name__ == "__main__":
-    app.start(port=int(os.environ.get("PORT", 3000)))
+# if __name__ == "__main__":
+#     app.start(port=int(os.environ.get("PORT", 3000)))
