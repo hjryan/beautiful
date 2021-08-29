@@ -2,7 +2,7 @@
 
 import logging
 
-from beautiful import App
+import App
 
 logging.basicConfig(level=logging.DEBUG)
 app = App()
