@@ -14,5 +14,4 @@ numpy==1.21.1
 ordereddict==1.1
 protobuf==3.17.3
 pyOpenSSL==20.0.1
-wincertstore==0.2.1
 zipp==3.5.0
