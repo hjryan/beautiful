@@ -2,8 +2,6 @@
 
 import logging
 
-import App
-
 logging.basicConfig(level=logging.DEBUG)
 app = App()
 
