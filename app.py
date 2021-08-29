@@ -227,16 +227,15 @@ def update_home_tab(client, event, logger):
             {"type": "section", "text": {"type": "mrkdwn", "text": "*Welcome to _Beautiful_'s Home* :flushed_pants: :horse_cargo_shorts: :virus_yellow:"}},
             {"type": "divider"},
             {"type": "section", "text": {"type": "mrkdwn","text": f"Hi <@{event['user']}>!"}},
-            {"type": "section", "text": {"type": "mrkdwn","text": ":yelp_logo_small: To *search Yelp*, type _please yelp [your search term] in [your search location]_. The first eight results will be displayed."}},
-            {"type": "section", "text": {"type": "mrkdwn","text": ":alien_bong: To get the current *air quality*, type _aqi_."}},
-            {"type": "section", "text": {"type": "mrkdwn","text": ":sunglasses_spin: To determine whether the *weather* is currently warmer for Hannah or Bianca, type _weather_."}},
+            {"type": "section", "text": {"type": "mrkdwn","text": ":yelp_logo_small: To *search Yelp*, type `please yelp [your search term] in [your search location]`. The first eight results will be displayed."}},
+            {"type": "section", "text": {"type": "mrkdwn","text": ":alien_bong: To get the current *air quality*, type `aqi`."}},
+            {"type": "section", "text": {"type": "mrkdwn","text": ":sunglasses_spin: To determine whether the *weather* is currently warmer for Hannah or Bianca, type `weather`."}},
             {"type": "section", "text": {"type": "mrkdwn","text": ":honk_nod: To see *emoji* as they are added in real time, please visit #emoji_town."}},
-            {"type": "section", "text": {"type": "mrkdwn","text": ":jacked: To experience other Easter eggs, just mention *kayaking* or *hot dogs*."}},
+            {"type": "section", "text": {"type": "mrkdwn","text": ":jacked: To experience other Easter eggs, just mention `kayaking` or `hot dogs`."}},
             {"type": "image", "image_url": "https://tenor.com/view/kermit-dancing-happy-smiling-gif-14490278", "alt_text": "kermit dancing"},
             {"type": "section", "text": {"type": "mrkdwn","text": f"_All emoji here are borrowed -- many from Diana :admire:_"}}
             ]
         })
-        air_quality_background(client, event, logger)
     except Exception as e:
         logger.error(f"Error publishing home tab: {e}")
 
@@ -325,17 +324,17 @@ def air_quality(message, client, event, logger, say):
 
 
         # determine how their air quality measures up
-        if pm_2_point_5 < 12:
+        if pm_2_point_5 <= 12:
             end = f"*good* (less than 12)"
-        elif pm_2_point_5 > 12 and pm_2_point_5 < 35.5:
+        elif pm_2_point_5 > 12 and pm_2_point_5 <= 35.5:
             end = "*moderate* (between 12 and 35.5)"
-        elif pm_2_point_5 > 35.5 and pm_2_point_5 < 55.5:
+        elif pm_2_point_5 > 35.5 and pm_2_point_5 <= 55.5:
             end = "*unhealthy for sensitive groups* (between 35.5 and 55.5)"
-        elif pm_2_point_5 > 55.5 and pm_2_point_5 < 150.5:
+        elif pm_2_point_5 > 55.5 and pm_2_point_5 <= 150.5:
             end = "*unhealthy* (between 55.5 and 150.5)"
-        elif pm_2_point_5 > 150.5 and pm_2_point_5 < 250.5:
+        elif pm_2_point_5 > 150.5 and pm_2_point_5 <= 250.5:
             end = "*very unhealthy* (between 150.5 and 250.5)"
-        elif pm_2_point_5 > 250.5 and pm_2_point_5 < 500.5:
+        elif pm_2_point_5 > 250.5 and pm_2_point_5 <= 500.5:
             end = "*hazardous* (between 250.5 and 500.5)"
         else:
             end = "*outside of the range of this program RIP*"
@@ -351,8 +350,8 @@ def air_quality(message, client, event, logger, say):
             logger.error(f"Error providing AQI report: {e}")
 
 
-#TODO: get this to start when app starts, remove from homepage event
-def air_quality_background(client, event, logger, prev_classification = "", count = 0):
+@app.message("monitor air")
+def air_quality_background(message, client, event, logger, prev_classification = "", count = 0):
     """query purpleair api for air quality data"""
 
     print("aqi being checked in background")
@@ -375,17 +374,17 @@ def air_quality_background(client, event, logger, prev_classification = "", coun
 
 
         # determine how their air quality measures up
-        if pm_2_point_5 < 12:
+        if pm_2_point_5 <= 12:
             classification = "good"
-        elif pm_2_point_5 > 12 and pm_2_point_5 < 35.5:
+        elif pm_2_point_5 > 12 and pm_2_point_5 <= 35.5:
             classification = "moderate"
-        elif pm_2_point_5 > 35.5 and pm_2_point_5 < 55.5:
+        elif pm_2_point_5 > 35.5 and pm_2_point_5 <= 55.5:
             end = "unhealthy for sensitive groups"
-        elif pm_2_point_5 > 55.5 and pm_2_point_5 < 150.5:
+        elif pm_2_point_5 > 55.5 and pm_2_point_5 <= 150.5:
             classification = "unhealthy"
-        elif pm_2_point_5 > 150.5 and pm_2_point_5 < 250.5:
+        elif pm_2_point_5 > 150.5 and pm_2_point_5 <= 250.5:
             classification = "very unhealthy"
-        elif pm_2_point_5 > 250.5 and pm_2_point_5 < 500.5:
+        elif pm_2_point_5 > 250.5 and pm_2_point_5 <= 500.5:
             classification = "hazardous"
         else:
             classification = "outside of the range of this program, RIP"
@@ -411,7 +410,7 @@ def air_quality_background(client, event, logger, prev_classification = "", coun
             else:
                 emoji = ":applause:"
 
-            result = client.chat_postMessage(channel="C02FMJW3Z", text=f"{emoji} <@U02FMJW3R>, air quality at *{sensor_name}* has changed to *{classification}* (PM2.5 is {pm_2_point_5})")
+            result = client.chat_postMessage(channel="C02BNH8KV1D", text=f"{emoji} <@U02FMJW3R>, air quality at *{sensor_name}* has changed to *{classification}* (PM2.5 is {pm_2_point_5})")
 
         # check every 15 min
         time.sleep(900)
@@ -467,7 +466,7 @@ def message_yelp(message, client, event, logger, say):
 
 
 @app.event("emoji_changed") 
-def message_emoji(message, client, event, logger):
+def message_emoji(message, client, event, logger, say):
     """post to emoji_town whenever a new emoji is added"""
 
     # excludes changes and removals
@@ -488,7 +487,12 @@ def message_emoji(message, client, event, logger):
         except Exception as e:
             logger.error(f"Error publishing new emoji: {e}")
 
-                    
+
+# @app.message("where")
+# def location_message(message, client, event, logger, say):
+#     """print message details to terminal"""
+#     print(message)
+
 # start app
 if __name__ == "__main__":
     app.start(port=int(os.environ.get("PORT", 3000)))
