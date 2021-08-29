@@ -16,6 +16,9 @@ def hello(body, ack):
     user_id = body["user_id"]
     ack(f"Hi <@{user_id}>!")
 
+@app.message("weather")
+def message_weather(message, say):
+    say("uhhhhhh")
 
 from flask import Flask, request
 from slack_bolt.adapter.flask import SlackRequestHandler
