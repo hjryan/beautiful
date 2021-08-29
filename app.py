@@ -7,8 +7,6 @@ from yelpapi import YelpAPI
 ########################################
 import logging
 
-#from slack_bolt import App
-
 logging.basicConfig(level=logging.DEBUG)
 app = App()
 
