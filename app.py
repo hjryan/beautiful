@@ -10,12 +10,10 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 app = App()
 
-
 # @app.command("/hello-bolt-python-heroku")
 # def hello(body, ack):
 #     user_id = body["user_id"]
 #     ack(f"Hi <@{user_id}>!")
-
 
 # initializes app with bot token and signing secret
 # app = App(token=os.environ.get('SLACK_BOT_TOKEN'),
@@ -506,18 +504,16 @@ def message_emoji(message, client, event, logger, say):
 #     print(message)
 
 
+from flask import Flask, request
+from slack_bolt.adapter.flask import SlackRequestHandler
+
+flask_app = Flask(__name__)
+handler = SlackRequestHandler(app)
 
 
-# from flask import Flask, request
-# from slack_bolt.adapter.flask import SlackRequestHandler
-
-# flask_app = Flask(__name__)
-# handler = SlackRequestHandler(app)
-
-
-# @flask_app.route("/slack/events", methods=["POST"])
-# def slack_events():
-#     return handler.handle(request)
+@flask_app.route("/slack/events", methods=["POST"])
+def slack_events():
+    return handler.handle(request)
 
 
 # start app
