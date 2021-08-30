@@ -495,11 +495,17 @@ def message_emoji(message, client, event, logger, say):
 #     print(message)
 
 
-from flask import Flask, request
+from flask import Flask, request, redirect
 from slack_bolt.adapter.flask import SlackRequestHandler
+
 
 flask_app = Flask(__name__)
 handler = SlackRequestHandler(app)
+
+
+@flask_app.route('/')
+def index():
+    return redirect('/index')
 
 
 @flask_app.route("/slack/events", methods=["POST"])
