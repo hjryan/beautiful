@@ -4,20 +4,11 @@ import time
 from slack_bolt import App
 from yelpapi import YelpAPI
 
-########################################
-import logging
-
-logging.basicConfig(level=logging.DEBUG)
-app = App()
-
-# @app.command("/hello-bolt-python-heroku")
-# def hello(body, ack):
-#     user_id = body["user_id"]
-#     ack(f"Hi <@{user_id}>!")
-
 # initializes app with bot token and signing secret
 # app = App(token=os.environ.get('SLACK_BOT_TOKEN'),
 #           signing_secret=os.environ.get('SLACK_SIGNING_SECRET'))
+
+app = App()
 
 # include open weather key
 open_weather = os.environ.get('OPEN_WEATHER')
@@ -353,8 +344,8 @@ def air_quality(message, client, event, logger, say):
         say(f"PM2.5 at *{sensor_name}* is currently *{pm_2_point_5}*, which is {end}")
 
         # user education re: how to get data for another sensor
-        say("_if this isn't an appropriate sensor, trying saying 'aqi sensor YourSensorID'_")
-        say("_to find a sensor ID, visit purpleair.com/map, click on a dot, and view the number after 'select=' in the url_")
+        say("_if this isn't an appropriate sensor, trying saying `aqi sensor YourSensorID`_")
+        say("_to find a sensor ID, visit purpleair.com/map, click on a dot, and view the number after `select=` in the url_")
         
     except Exception as e:
             logger.error(f"Error providing AQI report: {e}")
