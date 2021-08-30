@@ -11,25 +11,25 @@ Here are those features in action:
 
 App's home screen:
 
-![](home.gif)
+![](/gifs/home.gif)
 
 Emoji uploads:
 
-![](emoji.gif)
+![](/gifs/emoji.gif)
 
 Weather analysis:
 
-![](weather.gif)
+![](/gifs/weather.gif)
 
 Yelp:
 
-![](yelp.gif)
+![](/gifs/yelp.gif)
 
 Air quality analysis:
 
-![](air.gif)
+![](/gifs/air.gif)
 
 Easter eggs:
 
-![](hot_dogs.gif)
+![](/gifs/hot_dogs.gif)
 
