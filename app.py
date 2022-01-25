@@ -305,7 +305,7 @@ def air_quality(message, client, event, logger, say):
     """query purpleair api for air quality data"""
 
     # default sensor
-    sensor = "94279"
+    sensor = "93201"
 
     try:
         # check whether user has provided a different sensor
