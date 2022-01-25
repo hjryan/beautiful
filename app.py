@@ -362,7 +362,7 @@ def air_quality_background(message, client, event, logger, prev_classification =
         count = 1
 
     # default sensor
-    sensor = "94279"
+    sensor = "93201"
 
     try:
         # query purple air
